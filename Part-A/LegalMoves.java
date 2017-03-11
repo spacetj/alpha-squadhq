@@ -10,5 +10,7 @@ public class LegalMoves
         Scanner scanner = new Scanner(System.in);
         GameBoard board = new GameBoard(scanner);
         scanner.close();
+        board.printNumLegalHMoves();
+        board.printNumLegalVMoves();
     }
 }
