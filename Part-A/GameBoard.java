@@ -22,7 +22,7 @@ public class GameBoard
         board = new CellState[dimension][dimension];
 
         // Fill the board
-        for (int i = 0; i < dimension; i++) {
+        for (int i = dimension - 1; i >= 0; i--) {
             String[] pieces = scanner.nextLine().split("\\s+");
             for (int j = 0; j < dimension; j++) {
                 switch (pieces[j]) {
