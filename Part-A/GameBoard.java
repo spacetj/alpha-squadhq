@@ -1,4 +1,7 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Scanner;
+
 
 /*
  * A representation of a game board of Slider
@@ -8,11 +11,13 @@ public class GameBoard
 {
     private CellState[][] board;
     private int dimension;
+    private ArrayList<GamePiece> hPieces;
+    private ArrayList<GamePiece> vPieces;
 
     /**
      * Creates a GameBoard from an input stream.
      * 
-     * @param s The input stream to read from.
+     * @param scanner The input stream to read from.
      * @return The GameBoard representation of the input.
      */
     public GameBoard(Scanner scanner) {
@@ -21,6 +26,7 @@ public class GameBoard
         scanner.nextLine();
         board = new CellState[dimension][dimension];
 
+
         // Fill the board
         for (int i = dimension - 1; i >= 0; i--) {
             String[] pieces = scanner.nextLine().split("\\s+");
@@ -28,9 +34,11 @@ public class GameBoard
                 switch (pieces[j]) {
                     case "H":
                         board[i][j] = CellState.HORIZONTAL;
+                        hPieces.add(new GamePiece(i,j,CellState.HORIZONTAL,calculateMoves(i,j,CellState.HORIZONTAL)));
                         break;
                     case "V":
                         board[i][j] = CellState.VERTICAL;
+                        vPieces.add(new GamePiece(i,j,CellState.VERTICAL,calculateMoves(i,j,CellState.VERTICAL)));
                         break;
                     case "+":
                         board[i][j] = CellState.FREE;
@@ -76,20 +84,8 @@ public class GameBoard
     public void printNumLegalHMoves() {
         int count = 0;
 
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (board[i][j] == CellState.HORIZONTAL) {
-                    if (isValidMove(new Move(i, j, Direction.UP))) {
-                        count++;
-                    }
-                    if (isValidMove(new Move(i, j, Direction.DOWN))) {
-                        count++;
-                    }
-                    if (isValidMove(new Move(i, j, Direction.RIGHT))) {
-                        count++;
-                    }
-                }
-            }
+        for(GamePiece piece:hPieces){
+            count += piece.moves.size();
         }
         System.out.println(count);
     }
@@ -100,21 +96,29 @@ public class GameBoard
     public void printNumLegalVMoves() {
         int count = 0;
 
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (board[i][j] == CellState.VERTICAL) {
-                    if (isValidMove(new Move(i, j, Direction.UP))) {
-                        count++;
-                    }
-                    if (isValidMove(new Move(i, j, Direction.LEFT))) {
-                        count++;
-                    }
-                    if (isValidMove(new Move(i, j, Direction.RIGHT))) {
-                        count++;
-                    }
-                }
-            }
+        for(GamePiece piece:vPieces){
+            count += piece.moves.size();
         }
         System.out.println(count);
+    }
+
+
+    public Direction[] allowedDirections(CellState type){
+        if (type == CellState.HORIZONTAL) {
+            return new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN};
+        } else {
+            return new Direction[] {Direction.UP, Direction.RIGHT, Direction.LEFT};
+        }
+    }
+
+    public ArrayList<Move> calculateMoves(int x, int y, CellState type){
+        ArrayList<Move> moves = new ArrayList<Move>();
+        for (Direction dir: allowedDirections(type)){
+            Move tmp = new Move(x, y, dir);
+            if(isValidMove(tmp)){
+                moves.add(tmp);
+            }
+        }
+        return moves;
     }
 }

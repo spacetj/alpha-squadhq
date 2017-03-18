@@ -43,6 +43,32 @@ public class Move
         }
     }
 
+    public Move(GamePiece piece, Direction direction) {
+        this.sourceRow = sourceRow;
+        this.sourceCol = sourceCol;
+        this.direction = direction;
+
+        // Generate the destination position
+        switch (direction) {
+            case UP:
+                this.destRow = sourceRow + 1;
+                this.destCol = sourceCol;
+                break;
+            case DOWN:
+                this.destRow = sourceRow - 1;
+                this.destCol = sourceCol;
+                break;
+            case LEFT:
+                this.destRow = sourceRow;
+                this.destCol = sourceCol - 1;
+                break;
+            case RIGHT:
+                this.destRow = sourceRow;
+                this.destCol = sourceCol + 1;
+                break;
+        }
+    }
+
     /**
      * The starting row.
      */
