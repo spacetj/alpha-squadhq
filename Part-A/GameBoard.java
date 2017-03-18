@@ -34,10 +34,12 @@ public class GameBoard
                 switch (pieces[j]) {
                     case "H":
                         board[i][j] = CellState.HORIZONTAL;
+                        // Add the x, y, CellState and calculate the valid moves of each horizontal game piece
                         hPieces.add(new GamePiece(i,j,CellState.HORIZONTAL,calculateMoves(i,j,CellState.HORIZONTAL)));
                         break;
                     case "V":
                         board[i][j] = CellState.VERTICAL;
+                        // Add the x, y, CellState and calculate the valid moves of each vertical game piece
                         vPieces.add(new GamePiece(i,j,CellState.VERTICAL,calculateMoves(i,j,CellState.VERTICAL)));
                         break;
                     case "+":
@@ -102,7 +104,13 @@ public class GameBoard
         System.out.println(count);
     }
 
-
+    /**
+     * Returns a list of allowed direction that a piece can move to.
+     * Horizontal piece = Up, right and down
+     * Vertical piece = Up, right, left
+     * @param type CellState of the Piece
+     * @return
+     */
     public Direction[] allowedDirections(CellState type){
         if (type == CellState.HORIZONTAL) {
             return new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN};
@@ -111,9 +119,18 @@ public class GameBoard
         }
     }
 
+    /**
+     * Returns an arraylist of the valid moves that a given piece / cellstate can make
+     * @param x
+     * @param y
+     * @param type
+     * @return
+     */
     public ArrayList<Move> calculateMoves(int x, int y, CellState type){
         ArrayList<Move> moves = new ArrayList<Move>();
+        // For each allowed direction for the piece
         for (Direction dir: allowedDirections(type)){
+            // Create a temporary move and check if valid.
             Move tmp = new Move(x, y, dir);
             if(isValidMove(tmp)){
                 moves.add(tmp);
