@@ -1,3 +1,5 @@
+import com.oracle.tools.packager.Log;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,8 +13,9 @@ public class GameBoard
 {
     private CellState[][] board;
     private int dimension;
-    private ArrayList<GamePiece> hPieces;
-    private ArrayList<GamePiece> vPieces;
+    private ArrayList<GamePiece> hPieces = new ArrayList<GamePiece>();
+    private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();;
+
 
     /**
      * Creates a GameBoard from an input stream.
@@ -22,34 +25,43 @@ public class GameBoard
      */
     public GameBoard(Scanner scanner) {
         // Get the dimension and hence the board size
-        dimension = scanner.nextInt();
-        scanner.nextLine();
-        board = new CellState[dimension][dimension];
+        try {
+            dimension = scanner.nextInt();
+            scanner.nextLine();
+            board = new CellState[dimension][dimension];
 
 
-        // Fill the board
-        for (int i = dimension - 1; i >= 0; i--) {
-            String[] pieces = scanner.nextLine().split("\\s+");
-            for (int j = 0; j < dimension; j++) {
-                switch (pieces[j]) {
-                    case "H":
-                        board[i][j] = CellState.HORIZONTAL;
-                        // Add the x, y, CellState and calculate the valid moves of each horizontal game piece
-                        hPieces.add(new GamePiece(i,j,CellState.HORIZONTAL,calculateMoves(i,j,CellState.HORIZONTAL)));
-                        break;
-                    case "V":
-                        board[i][j] = CellState.VERTICAL;
-                        // Add the x, y, CellState and calculate the valid moves of each vertical game piece
-                        vPieces.add(new GamePiece(i,j,CellState.VERTICAL,calculateMoves(i,j,CellState.VERTICAL)));
-                        break;
-                    case "+":
-                        board[i][j] = CellState.FREE;
-                        break;
-                    case "B":
-                        board[i][j] = CellState.BLOCKED;
-                        break;
+            // Fill the board
+            for (int i = dimension - 1; i >= 0; i--) {
+                String[] pieces = scanner.nextLine().split("\\s+");
+                for (int j = 0; j < dimension; j++) {
+                    switch (pieces[j]) {
+                        case "H":
+                            board[i][j] = CellState.HORIZONTAL;
+                            // Add the x, y, CellState and calculate the valid moves of each horizontal game piece
+                            hPieces.add(new GamePiece(i, j, CellState.HORIZONTAL));
+                            break;
+                        case "V":
+                            board[i][j] = CellState.VERTICAL;
+                            // Add the x, y, CellState and calculate the valid moves of each vertical game piece
+                            vPieces.add(new GamePiece(i, j, CellState.VERTICAL));
+                            break;
+                        case "+":
+                            board[i][j] = CellState.FREE;
+                            break;
+                        case "B":
+                            board[i][j] = CellState.BLOCKED;
+                            break;
+                    }
                 }
             }
+
+
+            updateMoves();
+
+        }
+        catch (Exception e){
+            new Exception("Input not in the right format "+e.getMessage());
         }
     }
 
@@ -64,19 +76,20 @@ public class GameBoard
 
         // Positions must be within the board
         if (m.getSourceRow() < 0 || m.getSourceRow() >= dimension ||
-            m.getSourceCol() < 0 || m.getSourceCol() >= dimension ||
-            m.getDestRow() < 0 || m.getDestRow() >= dimension ||
-            m.getDestCol() < 0 || m.getDestCol() >= dimension ||
-            // The source space must be a piece
-            source == CellState.FREE ||
-            source == CellState.BLOCKED ||
-            // Pieces are restricted from certain directions
-            (source == CellState.HORIZONTAL && m.getDirection() == Direction.LEFT) ||
-            (source == CellState.VERTICAL && m.getDirection() == Direction.DOWN) ||
-            // The destination space must be free
-            board[m.getDestRow()][m.getDestCol()] != CellState.FREE) {
+                m.getSourceCol() < 0 || m.getSourceCol() >= dimension ||
+                m.getDestRow() < 0 || m.getDestRow() >= dimension ||
+                m.getDestCol() < 0 || m.getDestCol() >= dimension ||
+                // Source must be a piece
+                source == CellState.FREE || source == CellState.BLOCKED ||
+                // Horizontal piece should not go left
+                source == CellState.HORIZONTAL && m.getDirection() == Direction.LEFT ||
+                // Vertical piece should not go down
+            source == CellState.VERTICAL && m.getDirection() == Direction.DOWN
+                // The destination game space must be free
+                || board[m.getDestRow()][m.getDestCol()] != CellState.FREE){
             return false;
         }
+
         return true;
     }
 
@@ -84,12 +97,16 @@ public class GameBoard
      * Prints the number of legal moves for the horizontal player.
      */
     public void printNumLegalHMoves() {
+
         int count = 0;
 
-        for(GamePiece piece:hPieces){
-            count += piece.moves.size();
+        if(hPieces.size() > 0){
+            for (GamePiece piece : hPieces) {
+                count += piece.getMoves().size();
+            }
         }
         System.out.println(count);
+
     }
 
     /**
@@ -98,9 +115,13 @@ public class GameBoard
     public void printNumLegalVMoves() {
         int count = 0;
 
-        for(GamePiece piece:vPieces){
-            count += piece.moves.size();
+        if(vPieces.size() > 0){
+            for(GamePiece piece:vPieces){
+                count += piece.getMoves().size();
+
+            }
         }
+
         System.out.println(count);
     }
 
@@ -114,9 +135,10 @@ public class GameBoard
     public Direction[] allowedDirections(CellState type){
         if (type == CellState.HORIZONTAL) {
             return new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN};
-        } else {
+        } else if (type == CellState.VERTICAL) {
             return new Direction[] {Direction.UP, Direction.RIGHT, Direction.LEFT};
         }
+        return new Direction[]{};
     }
 
     /**
@@ -137,5 +159,18 @@ public class GameBoard
             }
         }
         return moves;
+    }
+
+    /**
+     *
+     */
+    public void updateMoves(){
+        for (GamePiece piece:hPieces){
+            piece.setMoves(calculateMoves(piece.getX(), piece.getY(),piece.getType()));
+        }
+
+        for (GamePiece piece:vPieces){
+            piece.setMoves(calculateMoves(piece.getX(), piece.getY(),piece.getType()));
+        }
     }
 }
