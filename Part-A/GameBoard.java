@@ -1,6 +1,3 @@
-import com.oracle.tools.packager.Log;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -19,31 +16,38 @@ public class GameBoard
 
     /**
      * Creates a GameBoard from an input stream.
-     * 
+     *
      * @param scanner The input stream to read from.
      * @return The GameBoard representation of the input.
      */
     public GameBoard(Scanner scanner) {
         // Get the dimension and hence the board size
+
+
         try {
             dimension = scanner.nextInt();
-            scanner.nextLine();
-            board = new CellState[dimension][dimension];
+        } catch (Exception e) {
+            System.err.println("First input needs to be a number.");
+            System.exit(1);
+        }
+        scanner.nextLine();
 
 
-            // Fill the board
-            for (int i = dimension - 1; i >= 0; i--) {
-                String[] pieces = scanner.nextLine().split("\\s+");
-                for (int j = 0; j < dimension; j++) {
+        board = new CellState[dimension][dimension];
+
+
+        // Fill the board
+        for (int i = dimension - 1; i >= 0; i--) {
+            String[] pieces = scanner.nextLine().split("\\s+");
+            for (int j = 0; j < dimension; j++) {
+                try {
                     switch (pieces[j]) {
                         case "H":
                             board[i][j] = CellState.HORIZONTAL;
-                            // Add the x, y, CellState and calculate the valid moves of each horizontal game piece
                             hPieces.add(new GamePiece(i, j, CellState.HORIZONTAL));
                             break;
                         case "V":
                             board[i][j] = CellState.VERTICAL;
-                            // Add the x, y, CellState and calculate the valid moves of each vertical game piece
                             vPieces.add(new GamePiece(i, j, CellState.VERTICAL));
                             break;
                         case "+":
@@ -52,22 +56,27 @@ public class GameBoard
                         case "B":
                             board[i][j] = CellState.BLOCKED;
                             break;
+                        default:
+                            System.err.println("Unrecognised input character.");
+                            System.exit(2);
                     }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.err.println("Not enough inputs");
+                    System.exit(3);
                 }
             }
-
-
-            updateMoves();
-
         }
-        catch (Exception e){
-            new Exception("Input not in the right format "+e.getMessage());
-        }
+
+
+        updateMoves();
+
     }
+
+
 
     /**
      * Determines whether a move is valid based on the board.
-     * 
+     *
      * @param m The tentative move.
      * @return Whether the move is valid.
      */
@@ -76,17 +85,17 @@ public class GameBoard
 
         // Positions must be within the board
         if (m.getSourceRow() < 0 || m.getSourceRow() >= dimension ||
-                m.getSourceCol() < 0 || m.getSourceCol() >= dimension ||
-                m.getDestRow() < 0 || m.getDestRow() >= dimension ||
-                m.getDestCol() < 0 || m.getDestCol() >= dimension ||
-                // Source must be a piece
-                source == CellState.FREE || source == CellState.BLOCKED ||
-                // Horizontal piece should not go left
-                source == CellState.HORIZONTAL && m.getDirection() == Direction.LEFT ||
-                // Vertical piece should not go down
+            m.getSourceCol() < 0 || m.getSourceCol() >= dimension ||
+            m.getDestRow() < 0 || m.getDestRow() >= dimension ||
+            m.getDestCol() < 0 || m.getDestCol() >= dimension ||
+            // Source must be a piece
+            source == CellState.FREE || source == CellState.BLOCKED ||
+            // Horizontal piece should not go left
+            source == CellState.HORIZONTAL && m.getDirection() == Direction.LEFT ||
+            // Vertical piece should not go down
             source == CellState.VERTICAL && m.getDirection() == Direction.DOWN
-                // The destination game space must be free
-                || board[m.getDestRow()][m.getDestCol()] != CellState.FREE){
+            // The destination game space must be free
+            || board[m.getDestRow()][m.getDestCol()] != CellState.FREE) {
             return false;
         }
 
@@ -161,16 +170,14 @@ public class GameBoard
         return moves;
     }
 
-    /**
-     *
-     */
+
     public void updateMoves(){
         for (GamePiece piece:hPieces){
-            piece.setMoves(calculateMoves(piece.getX(), piece.getY(),piece.getType()));
+            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol(),piece.getType()));
         }
 
         for (GamePiece piece:vPieces){
-            piece.setMoves(calculateMoves(piece.getX(), piece.getY(),piece.getType()));
+            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol(),piece.getType()));
         }
     }
 }

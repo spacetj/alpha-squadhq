@@ -1,28 +1,27 @@
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by TJ on 19/3/17.
  */
 public class GamePiece {
 
-    private int x;
-    private int y;
+    private int row;
+    private int col;
     private CellState type;
     private ArrayList<Move> moves;
 
-    public GamePiece(int x, int y, CellState type){
-        this.x = x;
-        this.y = y;
+    public GamePiece(int row, int col, CellState type){
+        this.row = row;
+        this.col = col;
         this.type = type;
     }
 
-    public int getX() {
-        return x;
+    public int getRow() {
+        return row;
     }
 
-    public int getY() {
-        return y;
+    public int getCol() {
+        return col;
     }
 
     public CellState getType() {
@@ -33,12 +32,12 @@ public class GamePiece {
         return moves;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public void setRow(int row) {
+        this.row = row;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public void setCol(int col) {
+        this.col = col;
     }
 
     public void setType(CellState type) {
