@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 /*
  * A representation of a piece in a game of Slider
- * Written by Angus Huang 640386 (angush) and Tejas Cherukara (taniyan)
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
 public class GamePiece {
     private int row;

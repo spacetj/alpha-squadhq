@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 /*
  * A representation of a game board of Slider
- * Written by Angus Huang 640386 (angush) and Tejas Cherukara (taniyan)
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
 public class GameBoard
 {

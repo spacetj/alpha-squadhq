@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 /*
  * Determines the number of legal moves available in a game of Slider
- * Written by Angus Huang 640386 (angush) and Tejas Cherukara (taniyan)
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
 public class LegalMoves
 {
