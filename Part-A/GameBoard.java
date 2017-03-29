@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 /*
  * A representation of a game board of Slider
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara (taniyan)
@@ -11,19 +10,16 @@ public class GameBoard
     private CellState[][] board;
     private int dimension;
     private ArrayList<GamePiece> hPieces = new ArrayList<GamePiece>();
-    private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();;
-
+    private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();
 
     /**
-     * Creates a GameBoard from an input stream.
+     * Creates a GameBoard from a scanner.
      *
-     * @param scanner The input stream to read from.
+     * @param scanner The scanner to read from.
      * @return The GameBoard representation of the input.
      */
     public GameBoard(Scanner scanner) {
         // Get the dimension and hence the board size
-
-
         try {
             dimension = scanner.nextInt();
         } catch (Exception e) {
@@ -32,11 +28,8 @@ public class GameBoard
         }
         scanner.nextLine();
 
-
-        board = new CellState[dimension][dimension];
-
-
         // Fill the board
+        board = new CellState[dimension][dimension];
         for (int i = dimension - 1; i >= 0; i--) {
             String[] pieces = scanner.nextLine().split("\\s+");
             for (int j = 0; j < dimension; j++) {
@@ -61,15 +54,14 @@ public class GameBoard
                             System.exit(2);
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.err.println("Not enough inputs");
+                    System.err.println("Not enough inputs.");
                     System.exit(3);
                 }
             }
         }
 
-
+        // Generate the moves for each piece
         updateMoves();
-
     }
 
 
@@ -98,7 +90,6 @@ public class GameBoard
             || board[m.getDestRow()][m.getDestCol()] != CellState.FREE) {
             return false;
         }
-
         return true;
     }
 
@@ -106,16 +97,14 @@ public class GameBoard
      * Prints the number of legal moves for the horizontal player.
      */
     public void printNumLegalHMoves() {
-
         int count = 0;
 
-        if(hPieces.size() > 0){
+        if (hPieces.size() > 0) {
             for (GamePiece piece : hPieces) {
                 count += piece.getMoves().size();
             }
         }
         System.out.println(count);
-
     }
 
     /**
@@ -124,24 +113,21 @@ public class GameBoard
     public void printNumLegalVMoves() {
         int count = 0;
 
-        if(vPieces.size() > 0){
-            for(GamePiece piece:vPieces){
+        if (vPieces.size() > 0) {
+            for (GamePiece piece : vPieces) {
                 count += piece.getMoves().size();
 
             }
         }
-
         System.out.println(count);
     }
 
     /**
-     * Returns a list of allowed direction that a piece can move to.
-     * Horizontal piece = Up, right and down
-     * Vertical piece = Up, right, left
-     * @param type CellState of the Piece
-     * @return
+     * Generates the allowed directions that a piece can move to.
+     * @param type The type of the piece to check.
+     * @return The directions that the piece can move to.
      */
-    public Direction[] allowedDirections(CellState type){
+    public Direction[] allowedDirections(CellState type) {
         if (type == CellState.HORIZONTAL) {
             return new Direction[] {Direction.UP, Direction.RIGHT, Direction.DOWN};
         } else if (type == CellState.VERTICAL) {
@@ -151,18 +137,17 @@ public class GameBoard
     }
 
     /**
-     * Returns an arraylist of the valid moves that a given piece / cellstate can make
-     * @param x
-     * @param y
-     * @param type
-     * @return
+     * Generates the valid moves that a piece can make.
+     * @param row The row position of the piece.
+     * @param col The column position of the piece.
+     * @return The moves that a piece can make.
      */
-    public ArrayList<Move> calculateMoves(int x, int y, CellState type){
+    public ArrayList<Move> calculateMoves(int row, int col){
         ArrayList<Move> moves = new ArrayList<Move>();
-        // For each allowed direction for the piece
-        for (Direction dir: allowedDirections(type)){
-            // Create a temporary move and check if valid.
-            Move tmp = new Move(x, y, dir);
+
+        // Create potentially valid moves and then check them.
+        for (Direction dir : allowedDirections(board[row][col])) {
+            Move tmp = new Move(row, col, dir);
             if(isValidMove(tmp)){
                 moves.add(tmp);
             }
@@ -170,14 +155,16 @@ public class GameBoard
         return moves;
     }
 
-
-    public void updateMoves(){
-        for (GamePiece piece:hPieces){
-            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol(),piece.getType()));
+    /**
+     * Updates the pieces with their valid moves.
+     */
+    public void updateMoves() {
+        for (GamePiece piece : hPieces) {
+            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol()));
         }
 
-        for (GamePiece piece:vPieces){
-            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol(),piece.getType()));
+        for (GamePiece piece : vPieces) {
+            piece.setMoves(calculateMoves(piece.getRow(), piece.getCol()));
         }
     }
 }

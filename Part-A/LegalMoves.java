@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.Scanner;
 
 /*
  * Determines the number of legal moves available in a game of Slider
