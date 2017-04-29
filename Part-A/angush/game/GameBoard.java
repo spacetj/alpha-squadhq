@@ -1,3 +1,5 @@
+package angush.game;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,10 +15,10 @@ public class GameBoard
     private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();
 
     /**
-     * Creates a GameBoard from a scanner.
+     * Creates a angush.game.GameBoard from a scanner.
      *
      * @param scanner The scanner to read from.
-     * @return The GameBoard representation of the input.
+     * @return The angush.game.GameBoard representation of the input.
      */
     public GameBoard(Scanner scanner) {
         // Get the dimension and hence the board size

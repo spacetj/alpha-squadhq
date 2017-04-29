@@ -1,3 +1,5 @@
+package angush.game;
+
 /*
  * The possible states of cells.
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
