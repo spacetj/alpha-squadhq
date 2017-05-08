@@ -4,7 +4,7 @@ package angush.game;
  * A move in a game of Slider
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
-public class Move 
+public class Move implements Cloneable
 {
     private int sourceRow;
     private int sourceCol;
@@ -79,5 +79,28 @@ public class Move
      */
     public Direction getDirection() {
         return direction;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "sourceRow=" + sourceRow +
+                ", sourceCol=" + sourceCol +
+                ", destRow=" + destRow +
+                ", destCol=" + destCol +
+                ", direction=" + direction +
+                '}';
+    }
+
+    @Override
+    public Move clone(){
+        Move result = null;
+        try{
+            result = (Move) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

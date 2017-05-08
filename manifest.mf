@@ -1,1 +1,1 @@
-Main-Class: angush.game.LegalMoves
+Main-Class: angush.game.Angush
