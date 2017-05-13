@@ -6,6 +6,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
+
+import javafx.util.Pair;
 
 
 /*
@@ -360,7 +363,7 @@ public class GameBoard implements Cloneable {
         }
         int min = heuristicValues[0];
         for (int i = 1; i < dimension; i++) {
-            if (i < min) min = i;
+            if (heuristicValues[i] < min) min = heuristicValues[i];
         }
         return min;
     }
@@ -451,6 +454,165 @@ public class GameBoard implements Cloneable {
 
     public Endgame getOpponent() {
         return opponent;
+    }
+
+    /**
+     * Calculates the minimum distance to victory for a side
+     * @param side The side to use
+     * @param infinity The number used for infinity
+     */
+    public int determineWinDistance(Endgame side, int infinity) {
+        LinkedList<Pair<Integer, Integer>> queue = new LinkedList<Pair<Integer, Integer>>();
+        int[][] dists = new int[dimension][dimension];
+
+        // Initialise the edge
+        for (int i = 0; i < dimension; i++) {
+            switch(side) {
+                case HORIZONTAL:
+                    queue.addLast(new Pair<Integer, Integer>(dimension - 1, i));
+                    if (board[dimension - 1][i] == CellState.BLOCKED ||
+                        board[dimension - 1][i] == CellState.VERTICAL) {
+                        dists[dimension - 1][i] = infinity;
+                    } else {
+                        dists[dimension - 1][i] = 1;
+                    }
+                    break;
+                case VERTICAL:
+                    queue.addLast(new Pair<Integer, Integer>(i, dimension - 1));
+                    if (board[i][dimension - 1] == CellState.BLOCKED ||
+                        board[i][dimension - 1] == CellState.HORIZONTAL) {
+                        dists[i][dimension - 1] = infinity;
+                    } else {
+                        dists[i][dimension - 1] = 1;
+                    }
+                    break;
+            }
+        }
+
+        // Propogate the distances backwards
+        while (!queue.isEmpty()) {
+            Pair<Integer, Integer> pos = queue.remove();
+            CellState testPos;
+            switch(side) {
+                case HORIZONTAL:
+                    // Propogate up
+                    if (pos.getKey() != dimension - 1) {
+                        testPos = board[pos.getKey() + 1][pos.getValue()];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() + 1, pos.getValue()));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
+                            dists[pos.getKey() + 1][pos.getValue()] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey() + 1][pos.getValue()]) {
+                            dists[pos.getKey() + 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    // Propogate down
+                    if (pos.getKey() != 0) {
+                        testPos = board[pos.getKey() - 1][pos.getValue()];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
+                            dists[pos.getKey() - 1][pos.getValue()] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey() - 1][pos.getValue()]) {
+                            dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    // Propogate left
+                    if (pos.getValue() != 0) {
+                        testPos = board[pos.getKey()][pos.getValue() - 1];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
+                            dists[pos.getKey()][pos.getValue() - 1] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey()][pos.getValue() - 1]) {
+                            dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    break;
+                case VERTICAL:
+                    // Propogate down
+                    if (pos.getKey() != 0) {
+                        testPos = board[pos.getKey() - 1][pos.getValue()];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
+                            dists[pos.getKey() - 1][pos.getValue()] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey() - 1][pos.getValue()]) {
+                            dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    // Propogate left
+                    if (pos.getValue() != 0) {
+                        testPos = board[pos.getKey()][pos.getValue() - 1];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
+                            dists[pos.getKey()][pos.getValue() - 1] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey()][pos.getValue() - 1]) {
+                            dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    // Propogate right
+                    if (pos.getValue() != dimension - 1) {
+                        testPos = board[pos.getKey()][pos.getValue() + 1];
+                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() + 1));
+                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
+                            dists[pos.getKey()][pos.getValue() + 1] = infinity;
+                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
+                            dists[pos.getKey()][pos.getValue() + 1]) {
+                            dists[pos.getKey()][pos.getValue() + 1] = dists[pos.getKey()][pos.getValue()] + 1;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // Add up the distances for each piece
+        ArrayList<GamePiece> pieces;
+        int dist = 0;
+        if (side == Endgame.HORIZONTAL) {
+            pieces = hPieces;
+        } else {
+            pieces = vPieces;
+        }
+        for (GamePiece piece : pieces) {
+            dist += dists[piece.getRow()][piece.getCol()];
+        }
+        return dist;
+    }
+
+    /**
+     * Calculates the average lateral position for a side and optionally normalises for number of game pieces
+     * @param side The side to use
+     * @param normalise Whether the result is normalised
+     */
+    public double determineLateralPosition(Endgame side, boolean normalise) {
+        // Add up the positions for each piece
+        double pos = 0;
+        int numPieces = 0;
+        switch(side) {
+            case HORIZONTAL:
+                numPieces = hPieces.size();
+                for (GamePiece piece : hPieces) {
+                    pos += piece.getRow();
+                }
+                break;
+            case VERTICAL:
+                numPieces = vPieces.size();
+                for (GamePiece piece : vPieces) {
+                    pos += piece.getCol();
+                }
+        }
+
+        // Normalise for board size
+        pos /= dimension;
+
+        // Optionally normalise for number of pieces remaining
+        if (normalise) {
+            pos /= numPieces;
+        }
+        
+        return pos;
     }
 
     /**
