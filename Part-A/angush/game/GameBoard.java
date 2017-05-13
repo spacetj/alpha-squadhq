@@ -464,6 +464,11 @@ public class GameBoard implements Cloneable {
     public int determineWinDistance(Endgame side, int infinity) {
         LinkedList<Pair<Integer, Integer>> queue = new LinkedList<Pair<Integer, Integer>>();
         int[][] dists = new int[dimension][dimension];
+        
+        // Initialise to infinity
+        for (int i = 0; i < dimension; i++) {
+            Arrays.fill(dists[i], infinity);
+        }
 
         // Initialise the edge
         for (int i = 0; i < dimension; i++) {
@@ -498,33 +503,27 @@ public class GameBoard implements Cloneable {
                     // Propogate up
                     if (pos.getKey() != dimension - 1) {
                         testPos = board[pos.getKey() + 1][pos.getValue()];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() + 1, pos.getValue()));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
-                            dists[pos.getKey() + 1][pos.getValue()] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey() + 1][pos.getValue()]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
+                            dists[pos.getKey() + 1][pos.getValue()] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey() + 1, pos.getValue()));
                             dists[pos.getKey() + 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
                     // Propogate down
                     if (pos.getKey() != 0) {
                         testPos = board[pos.getKey() - 1][pos.getValue()];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
-                            dists[pos.getKey() - 1][pos.getValue()] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey() - 1][pos.getValue()]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
+                            dists[pos.getKey() - 1][pos.getValue()] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
                             dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
                     // Propogate left
                     if (pos.getValue() != 0) {
                         testPos = board[pos.getKey()][pos.getValue() - 1];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.VERTICAL) {
-                            dists[pos.getKey()][pos.getValue() - 1] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey()][pos.getValue() - 1]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
+                            dists[pos.getKey()][pos.getValue() - 1] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
                             dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
@@ -533,33 +532,27 @@ public class GameBoard implements Cloneable {
                     // Propogate down
                     if (pos.getKey() != 0) {
                         testPos = board[pos.getKey() - 1][pos.getValue()];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
-                            dists[pos.getKey() - 1][pos.getValue()] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey() - 1][pos.getValue()]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
+                            dists[pos.getKey() - 1][pos.getValue()] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
                             dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
                     // Propogate left
                     if (pos.getValue() != 0) {
                         testPos = board[pos.getKey()][pos.getValue() - 1];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
-                            dists[pos.getKey()][pos.getValue() - 1] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey()][pos.getValue() - 1]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
+                            dists[pos.getKey()][pos.getValue() - 1] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
                             dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
                     // Propogate right
                     if (pos.getValue() != dimension - 1) {
                         testPos = board[pos.getKey()][pos.getValue() + 1];
-                        queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() + 1));
-                        if (testPos == CellState.BLOCKED || testPos == CellState.HORIZONTAL) {
-                            dists[pos.getKey()][pos.getValue() + 1] = infinity;
-                        } else if (dists[pos.getKey()][pos.getValue()] + 1 <
-                            dists[pos.getKey()][pos.getValue() + 1]) {
+                        if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
+                            dists[pos.getKey()][pos.getValue() + 1] == infinity) {
+                            queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() + 1));
                             dists[pos.getKey()][pos.getValue() + 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
                     }
