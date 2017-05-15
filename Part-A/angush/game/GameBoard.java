@@ -377,12 +377,12 @@ public class GameBoard implements Cloneable {
         if(player == Endgame.HORIZONTAL) {
             result += newBoard.determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
             result -= newBoard.determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
-            result -= newBoard.determineLateralPosition(Endgame.HORIZONTAL, true);
+            result += Math.random() * 0.5;
             return result;
         } else {
             result += newBoard.determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
             result -= newBoard.determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
-            result -= newBoard.determineLateralPosition(Endgame.VERTICAL, true);
+            result += Math.random() * 0.5;
             return result;
         }
     }
@@ -393,12 +393,12 @@ public class GameBoard implements Cloneable {
         if(player == Endgame.HORIZONTAL) {
             result += determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
             result -= determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
-            //result -= determineLateralPosition(Endgame.HORIZONTAL, true);
+            result += Math.random() * 0.5;
             return result;
         } else {
             result += determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
             result -= determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
-            //result -= determineLateralPosition(Endgame.VERTICAL, true);
+            result += Math.random() * 0.5;
             return result;
         }
     }
