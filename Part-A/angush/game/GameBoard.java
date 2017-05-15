@@ -275,7 +275,7 @@ public class GameBoard implements Cloneable {
         for (int piece = 0; piece < dimension - 1; piece++) {
             if (!hPieces.get(piece).isCrossedFinishLine()) break;
             // Check if final iteration
-            if (piece == dimension - 1) {
+            if (piece == dimension - 2) {
                 if(turn == Endgame.HORIZONTAL_WIN) utility = 0;
                 return Endgame.HORIZONTAL_WIN;
             }
@@ -285,7 +285,7 @@ public class GameBoard implements Cloneable {
         for (int piece = 0; piece < dimension - 1; piece++) {
             if (!vPieces.get(piece).isCrossedFinishLine()) break;
             // Check if final iteration
-            if (piece == dimension - 1){
+            if (piece == dimension - 2){
                 if(turn == Endgame.VERTICAL_WIN) utility = 1;
                 return Endgame.VERTICAL_WIN;
             }
@@ -354,14 +354,33 @@ public class GameBoard implements Cloneable {
         GameBoard newBoard = clone();
         newBoard.makeMove(move, player);
         double result = 0;
+        int infinity = 5000;
+
+        // Check if the board is a terminal state
+        /*if (newBoard.isGameOver()) {
+            if (player == Endgame.HORIZONTAL) {
+                if (turn == Endgame.HORIZONTAL_WIN) {
+                    return infinity + 1;
+                } else {
+                    return -(infinity + 1);
+                }
+            } else {
+                if (turn == Endgame.VERTICAL_WIN) {
+                    return infinity + 1;
+                } else {
+                    return -(infinity + 1);
+                }
+            }
+        }*/
+
         if(player == Endgame.HORIZONTAL) {
-            result += newBoard.determineWinDistance(Endgame.VERTICAL, 5000);
-            result -= newBoard.determineWinDistance(Endgame.HORIZONTAL, 5000);
+            result += newBoard.determineWinDistance(Endgame.VERTICAL, infinity);
+            result -= newBoard.determineWinDistance(Endgame.HORIZONTAL, infinity);
             result -= newBoard.determineLateralPosition(Endgame.HORIZONTAL, true);
             return result;
         } else {
-            result += newBoard.determineWinDistance(Endgame.HORIZONTAL, 5000);
-            result -= newBoard.determineWinDistance(Endgame.VERTICAL, 5000);
+            result += newBoard.determineWinDistance(Endgame.HORIZONTAL, infinity);
+            result -= newBoard.determineWinDistance(Endgame.VERTICAL, infinity);
             result -= newBoard.determineLateralPosition(Endgame.VERTICAL, true);
             return result;
         }
