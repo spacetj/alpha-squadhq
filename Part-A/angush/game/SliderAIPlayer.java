@@ -20,8 +20,9 @@ import java.util.List;
  */
 public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,Move,Endgame>{
 
-    public SliderAIPlayer(Game<GameBoard, Move, Endgame> game, double utilMin, double utilMax, int time) {
-        super(game, utilMin, utilMax, time);
+    public SliderAIPlayer(Game<GameBoard, Move, Endgame> game, double utilMin, double utilMax, int time,
+        boolean millis) {
+        super(game, utilMin, utilMax, time, millis);
     }
 
     /**
