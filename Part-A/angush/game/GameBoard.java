@@ -351,21 +351,10 @@ public class GameBoard implements Cloneable {
      * @return
      */
     public double calculateHeuristics(Move move, Endgame player) {
-        int[] heuristicValues = new int[dimension];
-        if (isValidMove(move)) {
-            for (int i = 0; i < dimension; i++) {
-                if (player == Endgame.HORIZONTAL) {
-                    heuristicValues[i] = manhattanDistace(move.getDestRow(), move.getDestCol(), i, dimension);
-                } else {
-                    heuristicValues[i] = manhattanDistace(dimension,i,move.getDestRow(),move.getDestCol());
-                }
-            }
-        }
-        int min = heuristicValues[0];
-        for (int i = 1; i < dimension; i++) {
-            if (heuristicValues[i] < min) min = heuristicValues[i];
-        }
-        return min;
+        if(player == Endgame.HORIZONTAL)
+            return determineWinDistance(Endgame.VERTICAL, Integer.MAX_VALUE) - determineWinDistance(Endgame.HORIZONTAL, Integer.MAX_VALUE) + determineLateralPosition(Endgame.HORIZONTAL, true);
+        else
+            return determineWinDistance(Endgame.HORIZONTAL, Integer.MAX_VALUE) - determineWinDistance(Endgame.VERTICAL, Integer.MAX_VALUE) + determineLateralPosition(Endgame.VERTICAL, true);
     }
 
     /**

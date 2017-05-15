@@ -18,7 +18,7 @@ public class Angush implements aiproj.slider.SliderPlayer {
     @Override
     public void init(int dimension, String board, char player) {
         this.game = new SliderGame(dimension,board,player);
-        this.strategy = IterativeDeepeningAlphaBetaSearch.createFor(game,minMaxUtil()[1],minMaxUtil()[0],3);
+        this.strategy = new SliderAIPlayer(game,minMaxUtil()[1],minMaxUtil()[0],1);
     }
 
     /**
