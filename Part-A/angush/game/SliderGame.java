@@ -49,11 +49,6 @@ public class SliderGame implements Game<GameBoard, Move,Endgame> {
 
     @Override
     public double getUtility(GameBoard gameBoard, Endgame player) {
-        double result = gameBoard.getUtility();
-        if (result != -1) {
-            return result;
-        } else {
-            throw new IllegalArgumentException("State is not terminal.");
-        }
+        return gameBoard.getUtility();
     }
 }
