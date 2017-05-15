@@ -1,62 +1,66 @@
-COMP30024 Project Part A
+COMP30024 Project Part B
 By Angus Huang and Tejas Cherukara
 
 ------------------------------------------------------------------------------------
-Structure of code:
-CellState = Enum of possible cell states
-Direction = Enum of possible directions
-
+Structure
+------------------------------------------------------------------------------------
+ActionValuePair: A pair consisting of moves and values, used by AIMA
+Angush: The player class which implements the interface needed by the referee
+CellState: Enumeration of possible cell states
+Direction: Enumeration of possible directions
+Endgame: Enumeration of turn states, also used for player and terminal states
+GameBoard: Representation of the board, along with board-specific functions like
+    calculation of the heuristic
+GamePiece: Representation of a piece on the board, contains things like position and
+    possible moves
+Move: Representation of a move
+SliderAIPlayer: Subclass of the AIMA implementation of the search strategy which
+    allows for us to plug in our heuristics
+SliderGame: Representation of a Game used by AIMA
 
 ------------------------------------------------------------------------------------
-Pseudocode
-
-
-Main Program:
-Read in a game board from input and generate a representation of it.
-Print out the number of moves for the horizontal player.
-Print out the number of moves for the vertical player.
-
-
-Reading in the game board:
-Read in the dimension of the board n.
-Create an n by n collection of cell states.
-For n^2 cell inputs:
-	Add the cell to the collection.
-	If the cell is a game piece:
-		Add the piece to its player’s list of pieces.
-For each game piece:
-	For each allowed direction of the piece:
-		Generate the move that would result from the piece going in that
-direction.
-If move is valid relative to the board:
-	Add it to the piece’s move list.
-
-
-Checking if a move is valid relative to the board:
-If the destination and starting positions are within the board, the starting
-position is that of a game piece moving in a valid direction and the
-destination isn’t blocked:
-The move is valid.
-Else:
-	The move is invalid.
-
-
-Printing out the number of moves for a player x:
-Count := 0;
-For each of x’s pieces p:
-	Count := Count + p.moves.length;
-Print(Count);
+Third Party Libraries
+------------------------------------------------------------------------------------
+We are making use of the AIMA Core library for its implementation of iterative
+deepening alpha beta search.
 
 ------------------------------------------------------------------------------------
-Time Complexity
-Let n be the number of rows of the game board.
-Thus we have 2(n-1) number of game pieces and n^2 cells.
-Reading in a game board is O(n^2) since processing each cell is constant.
-Then we have to generate the legal moves for each game piece. We know there are 2(n-1) game 
-pieces and for each piece, they have at most 3 available moves. Checking if a move is legal is 
-constant (only have to check the starting position and destination position). This means that altogether, 
-this would be O(n). The running total would be O(n^2) + O(n) which reduces to O(n^2).
+Search Strategy
+------------------------------------------------------------------------------------
+Our search strategy was iterative deepening alpha beta search. This algorithm
+provides benefits over DFS in that it works well within time constraints like BFS,
+but uses far less memory than BFS.
 
-Lastly, we must get the number of moves available for each player. To do this, we must query all 2(n-1) 
-game pieces and check how many moves they have available (at most 3). This action is O(n), and so altogether 
-the program has a time complexity of O(n^2).
+------------------------------------------------------------------------------------
+Evaluation Function
+------------------------------------------------------------------------------------
+The evaluation function is comprised of the following features:
+a. Distance to victory
+The minimum number of moves to win, assuming the opponent stays still.
+
+b. Distance to loss
+The minimum number of moves to lose, assuming you stay still.
+
+c. Random Number
+A small randomly generated number to break ties.
+
+The overall function is: (b) - (a) + (c)
+
+------------------------------------------------------------------------------------
+Additional Comments
+------------------------------------------------------------------------------------
+To think up strategies to apply, we played and analysed some rounds of the game in
+person. This led to the conclusion that the game was probably one where the first
+player wins.
+
+In order to get some evidence, we wrote up a program to generate the entire tree
+for the game, and then outputted the optimum move tree for a player. With this
+information (which totalled around 1GB for a 4 dimension board), it was shown that
+in almost every configuration, the first player could force a win. At this point,
+we considered making our bot concede immediately if it were the second player, but
+decided that this was too fatalistic.
+
+We used our huge move trees to find some common themes in the optimum play. There
+were some seemingly unstoppable strategies for certain configurations, but overall
+there seemed to be one theme in picking a move: pick a move that increases the
+opponent's distance to victory, or one that decreases our distance to victory.
