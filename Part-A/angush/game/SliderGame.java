@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class SliderGame implements Game<GameBoard, Move,Endgame> {
     protected GameBoard gameBoard;
+    public static final int INFINITY = 100;
 
     public SliderGame(int dimension, String board, char player) {
         gameBoard = new GameBoard(dimension,board,player);
@@ -32,7 +33,8 @@ public class SliderGame implements Game<GameBoard, Move,Endgame> {
     }
 
     @Override
-    public List<angush.game.Move> getActions(GameBoard gameBoard) { return gameBoard.getMoves(gameBoard.getPlayer());
+    public List<angush.game.Move> getActions(GameBoard gameBoard) {
+        return gameBoard.getMoves(gameBoard.getPlayer());
     }
 
     @Override

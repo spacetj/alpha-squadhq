@@ -8,6 +8,9 @@ import aima.core.agent.Action;
 import aima.core.agent.State;
 import aima.core.search.adversarial.Game;
 import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
+import angush.game.Endgame;
+import angush.game.Move;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,5 +46,15 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
         }
         if(result != null) return result;
         else return actions;
+    }
+
+    @Override
+    protected double eval(GameBoard state, Endgame player) {
+        super.eval(state, player);
+        if (game.isTerminal(state)) {
+            return game.getUtility(state, player);
+        } else {
+            return state.calculateHeuristics(player);
+        }
     }
 }

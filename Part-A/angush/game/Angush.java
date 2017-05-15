@@ -18,7 +18,7 @@ public class Angush implements aiproj.slider.SliderPlayer {
     @Override
     public void init(int dimension, String board, char player) {
         this.game = new SliderGame(dimension,board,player);
-        this.strategy = new SliderAIPlayer(game,minMaxUtil()[1],minMaxUtil()[0],1);
+        this.strategy = new SliderAIPlayer(game, -SliderGame.INFINITY, SliderGame.INFINITY, 1);
     }
 
     /**
@@ -31,8 +31,8 @@ public class Angush implements aiproj.slider.SliderPlayer {
         angush.game.Move convertedMove = null;
         if (move != null) {
             convertedMove = toConvertMove(move);
-            game.gameBoard.makeMove(convertedMove,game.getPlayers()[1]);
         }
+            game.gameBoard.makeMove(convertedMove,game.getPlayers()[1]);
     }
 
     /**
@@ -44,11 +44,11 @@ public class Angush implements aiproj.slider.SliderPlayer {
     @Override
     public Move move() {
         angush.game.Move tmp = strategy.makeDecision(game.gameBoard);
+        game.gameBoard.makeMove(tmp,game.gameBoard.getTurn());
         if (tmp == null) {
             System.out.println("MP.move.null");
             return null;
         }
-        game.gameBoard.makeMove(tmp,game.gameBoard.getTurn());
         Move tmpMove = fromConvertMove(tmp);
         return tmpMove;
     }
