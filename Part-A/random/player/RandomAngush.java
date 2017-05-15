@@ -37,6 +37,7 @@ public class RandomAngush implements aiproj.slider.SliderPlayer {
             angush.game.Move convertedMove = toConvertMove(move);
             gameBoard.makeMove(convertedMove, gameBoard.getPlayer());
         }
+        gameBoard.setTurn(gameBoard.determineTurn());
     }
 
     @Override
@@ -45,9 +46,12 @@ public class RandomAngush implements aiproj.slider.SliderPlayer {
             if(!piece.isCrossedFinishLine() && piece.getMoves().size() > 0){
                 Move tmp = fromConvertMove(piece.getMoves().get(0));
                 gameBoard.makeMove(piece.getMoves().get(0),gameBoard.getTurn());
+                gameBoard.setTurn(gameBoard.determineTurn());
+
                 return tmp;
             }
         }
+        gameBoard.setTurn(gameBoard.determineTurn());
 
         return null;
     }

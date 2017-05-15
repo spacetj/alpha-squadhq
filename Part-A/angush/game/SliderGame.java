@@ -8,12 +8,12 @@ import java.util.List;
 /**
  * Created by TJ on 3/5/17.
  */
-public class SliderGame implements Game<GameBoard, Move,Endgame> {
+public class SliderGame implements Game<GameBoard, Move, Endgame> {
     protected GameBoard gameBoard;
     public static final int INFINITY = 100;
 
     public SliderGame(int dimension, String board, char player) {
-        gameBoard = new GameBoard(dimension,board,player);
+        gameBoard = new GameBoard(dimension, board, player);
     }
 
 
@@ -24,7 +24,7 @@ public class SliderGame implements Game<GameBoard, Move,Endgame> {
 
     @Override
     public Endgame[] getPlayers() {
-        return new Endgame[] {gameBoard.getPlayer(),gameBoard.getOpponent()};
+        return new Endgame[]{gameBoard.getPlayer(), gameBoard.getOpponent()};
     }
 
     @Override

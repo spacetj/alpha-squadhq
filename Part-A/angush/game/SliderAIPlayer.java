@@ -18,10 +18,10 @@ import java.util.List;
 /**
  * Created by TJ on 30/4/17.
  */
-public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,Move,Endgame>{
+public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard, Move, Endgame> {
 
     public SliderAIPlayer(Game<GameBoard, Move, Endgame> game, double utilMin, double utilMax, int time,
-        boolean millis) {
+                          boolean millis) {
         super(game, utilMin, utilMax, time, millis);
     }
 
@@ -37,15 +37,14 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
                     actions.size());
             for (Move action : actions)
                 actionEstimates.add(ActionValuePair.createFor(action,
-                        state.calculateHeuristics(action,player)));
+                        state.calculateHeuristics(action, player)));
             Collections.sort(actionEstimates);
             result = new ArrayList<Move>();
             for (ActionValuePair<Move> pair : actionEstimates) {
-                System.out.println(pair.getAction()+ " | Heuristic = "+pair.getValue());
                 result.add(pair.getAction());
             }
         }
-        if(result != null) return result;
+        if (result != null) return result;
         else return actions;
     }
 
