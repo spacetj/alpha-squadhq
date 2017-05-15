@@ -351,10 +351,20 @@ public class GameBoard implements Cloneable {
      * @return
      */
     public double calculateHeuristics(Move move, Endgame player) {
-        if(player == Endgame.HORIZONTAL)
-            return determineWinDistance(Endgame.VERTICAL, Integer.MAX_VALUE) - determineWinDistance(Endgame.HORIZONTAL, Integer.MAX_VALUE) + determineLateralPosition(Endgame.HORIZONTAL, true);
-        else
-            return determineWinDistance(Endgame.HORIZONTAL, Integer.MAX_VALUE) - determineWinDistance(Endgame.VERTICAL, Integer.MAX_VALUE) + determineLateralPosition(Endgame.VERTICAL, true);
+        GameBoard newBoard = clone();
+        newBoard.makeMove(move, player);
+        double result = 0;
+        if(player == Endgame.HORIZONTAL) {
+            result += newBoard.determineWinDistance(Endgame.VERTICAL, 5000);
+            result -= newBoard.determineWinDistance(Endgame.HORIZONTAL, 5000);
+            result -= newBoard.determineLateralPosition(Endgame.HORIZONTAL, true);
+            return result;
+        } else {
+            result += newBoard.determineWinDistance(Endgame.HORIZONTAL, 5000);
+            result -= newBoard.determineWinDistance(Endgame.VERTICAL, 5000);
+            result -= newBoard.determineLateralPosition(Endgame.VERTICAL, true);
+            return result;
+        }
     }
 
     /**
@@ -463,21 +473,21 @@ public class GameBoard implements Cloneable {
         for (int i = 0; i < dimension; i++) {
             switch(side) {
                 case HORIZONTAL:
-                    queue.addLast(new Pair<Integer, Integer>(dimension - 1, i));
-                    if (board[dimension - 1][i] == CellState.BLOCKED ||
-                        board[dimension - 1][i] == CellState.VERTICAL) {
-                        dists[dimension - 1][i] = infinity;
-                    } else {
-                        dists[dimension - 1][i] = 1;
-                    }
-                    break;
-                case VERTICAL:
                     queue.addLast(new Pair<Integer, Integer>(i, dimension - 1));
                     if (board[i][dimension - 1] == CellState.BLOCKED ||
-                        board[i][dimension - 1] == CellState.HORIZONTAL) {
+                        board[i][dimension - 1] == CellState.VERTICAL) {
                         dists[i][dimension - 1] = infinity;
                     } else {
                         dists[i][dimension - 1] = 1;
+                    }
+                    break;
+                case VERTICAL:
+                    queue.addLast(new Pair<Integer, Integer>(dimension - 1, i));
+                    if (board[dimension - 1][i] == CellState.BLOCKED ||
+                        board[dimension - 1][i] == CellState.HORIZONTAL) {
+                        dists[dimension - 1][i] = infinity;
+                    } else {
+                        dists[dimension - 1][i] = 1;
                     }
                     break;
             }
@@ -487,6 +497,9 @@ public class GameBoard implements Cloneable {
         while (!queue.isEmpty()) {
             Pair<Integer, Integer> pos = queue.remove();
             CellState testPos;
+            if (dists[pos.getKey()][pos.getValue()] == infinity) {
+                continue;
+            }
             switch(side) {
                 case HORIZONTAL:
                     // Propogate up
@@ -548,6 +561,8 @@ public class GameBoard implements Cloneable {
                     break;
             }
         }
+        // TODO: Remove
+        //System.out.println(Arrays.deepToString(dists));
 
         // Add up the distances for each piece
         ArrayList<GamePiece> pieces;
@@ -558,9 +573,12 @@ public class GameBoard implements Cloneable {
             pieces = vPieces;
         }
         for (GamePiece piece : pieces) {
-            dist += dists[piece.getRow()][piece.getCol()];
+            if (!piece.isCrossedFinishLine()) {
+                dist += dists[piece.getRow()][piece.getCol()];
+            }
         }
-        return dist;
+
+        return Integer.min(dist, infinity);
     }
 
     /**
@@ -572,17 +590,24 @@ public class GameBoard implements Cloneable {
         // Add up the positions for each piece
         double pos = 0;
         int numPieces = 0;
+        double mid = dimension / 2.0;
         switch(side) {
             case HORIZONTAL:
                 numPieces = hPieces.size();
                 for (GamePiece piece : hPieces) {
-                    pos += piece.getRow();
+                    if (!piece.isCrossedFinishLine()) {
+                        pos += Math.abs(mid - piece.getRow());
+                        numPieces++;
+                    }
                 }
                 break;
             case VERTICAL:
                 numPieces = vPieces.size();
                 for (GamePiece piece : vPieces) {
-                    pos += piece.getCol();
+                    if (!piece.isCrossedFinishLine()) {
+                        pos += Math.abs(mid - piece.getCol());
+                        numPieces++;
+                    }
                 }
         }
 
