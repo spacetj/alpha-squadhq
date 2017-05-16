@@ -28,21 +28,22 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
      */
     @Override
     public List<Move> orderActions(GameBoard state, List<Move> actions, TurnState player, int depth) {
-        List<Move> result = actions;
-        if (depth == 0) {
-            List<ActionValuePair<Move>> actionEstimates = new ArrayList<ActionValuePair<Move>>(
-                    actions.size());
-            for (Move action : actions)
-                actionEstimates.add(ActionValuePair.createFor(action,
-                        state.calculateHeuristics(action, player)));
-            Collections.sort(actionEstimates);
-            result = new ArrayList<Move>();
-            for (ActionValuePair<Move> pair : actionEstimates) {
-                result.add(pair.getAction());
-            }
+        List<Move> result;
+        List<ActionValuePair<Move>> actionEstimates = new ArrayList<ActionValuePair<Move>>(
+                actions.size());
+        for (Move action : actions)
+            actionEstimates.add(ActionValuePair.createFor(action,
+                    state.calculateHeuristics(action, player)));
+        Collections.sort(actionEstimates);
+        result = new ArrayList<Move>();
+        for (ActionValuePair<Move> pair : actionEstimates) {
+            result.add(pair.getAction());
         }
-        if (result != null) return result;
-        else return actions;
+        if (!result.isEmpty()) {
+            return result;
+        } else {
+            return actions;
+        }
     }
 
     /**

@@ -368,19 +368,15 @@ public class GameBoard implements Cloneable {
      * @return The heuristic value for this board.
      */
     public double calculateHeuristics(TurnState player) {
-        double result = 0;
-
-        if (player == TurnState.HORIZONTAL) {
-            result += determineWinDistance(TurnState.VERTICAL);
-            result -= determineWinDistance(TurnState.HORIZONTAL);
-            result += Math.random() * 0.05;
-            return result;
-        } else {
-            result += determineWinDistance(TurnState.HORIZONTAL);
-            result -= determineWinDistance(TurnState.VERTICAL);
-            result += Math.random() * 0.05;
-            return result;
+        if (isGameOver()) {
+            return utility;
         }
+
+        double result = 0;
+        result += determineWinDistance(opponent);
+        result -= determineWinDistance(player);
+        result += determineForwardPosition(player, true);
+        return result;
     }
 
     /**
@@ -584,6 +580,47 @@ public class GameBoard implements Cloneable {
 
         return dist;
     }
+
+    /**
+     * Calculates the average forward position for a side and optionally normalises for number of game pieces
+     *
+     * @param side      The side to use
+     * @param normalise Whether the result is normalised
+     */
+    public double determineForwardPosition(TurnState side, boolean normalise) {
+        // Add up the positions for each piece
+        double pos = 0;
+        int numPieces = 0;
+        switch (side) {
+            case HORIZONTAL:
+                numPieces = hPieces.size();
+                for (GamePiece piece : hPieces) {
+                    if (!piece.isCrossedFinishLine()) {
+                        pos += piece.getCol();
+                        numPieces++;
+                    }
+                }
+                break;
+            case VERTICAL:
+                numPieces = vPieces.size();
+                for (GamePiece piece : vPieces) {
+                    if (!piece.isCrossedFinishLine()) {
+                        pos += piece.getRow();
+                        numPieces++;
+                    }
+                }
+        }
+
+        // Normalise for board size
+        pos /= dimension;
+
+        // Optionally normalise for number of pieces remaining
+        if (normalise) {
+            pos /= numPieces;
+        }
+
+        return pos;
+}
 
     public void setTurn(TurnState turn) {
         this.turn = turn;
