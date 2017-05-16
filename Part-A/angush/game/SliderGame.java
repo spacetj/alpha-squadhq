@@ -54,4 +54,18 @@ public class SliderGame implements Game<GameBoard, Move, TurnState> {
     public double getUtility(GameBoard gameBoard, TurnState player) {
         return gameBoard.getUtility();
     }
+
+    /**
+     * Determines the opponent to a player.
+     * 
+     * @param player The player's side.
+     * @return The opponent's side.
+     */
+    public static TurnState determineOpponent(TurnState player) {
+        if (player == TurnState.HORIZONTAL) {
+            return TurnState.VERTICAL;
+        } else {
+            return TurnState.HORIZONTAL;
+        }
+    }
 }

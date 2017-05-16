@@ -373,7 +373,7 @@ public class GameBoard implements Cloneable {
         }
 
         double result = 0;
-        result += determineWinDistance(opponent);
+        result += determineWinDistance(SliderGame.determineOpponent(player));
         result -= determineWinDistance(player);
         result += determineForwardPosition(player, true);
         return result;

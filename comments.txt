@@ -37,12 +37,19 @@ Evaluation Function
 The evaluation function is comprised of the following features:
 a. Distance to victory
 The minimum number of moves to win, assuming the opponent stays still.
+The formula isn't particularly intelligent when deciding if blocking is the best
+option, as that requires checking the minimum moves to the end edge (ignoring all
+blocking pieces) for the piece(s) being blocked against the minimum moves to the
+end edge for the piece(s) doing the blocking, which was deemed to be not worth the
+time/effort required.
 
 b. Distance to loss
 The minimum number of moves to lose, assuming you stay still.
 
-c. Random Number
-A small randomly generated number to break ties.
+c. Average "Forward" position
+Takes the average forward position (so the column positions for horizontal and
+row for vertical) normalised for the size of the board. This is used to weight
+forward moves over lateral moves.
 
 The overall function is: (b) - (a) + (c)
 
