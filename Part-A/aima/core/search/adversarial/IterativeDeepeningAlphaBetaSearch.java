@@ -55,7 +55,7 @@ public class IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER> implements
 	 */
 	public static <STATE, ACTION, PLAYER> IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER> createFor(
 			Game<STATE, ACTION, PLAYER> game, double utilMin, double utilMax, int time) {
-		return new IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER>(game, utilMin, utilMax, time, false);
+		return new IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER>(game, utilMin, utilMax, time);
 	}
 
 	/**
@@ -75,11 +75,11 @@ public class IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER> implements
 	 *            Maximal computation time in seconds.
 	 */
 	public IterativeDeepeningAlphaBetaSearch(Game<STATE, ACTION, PLAYER> game, double utilMin, double utilMax,
-			int time, boolean millis) {
+			int time) {
 		this.game = game;
 		this.utilMin = utilMin;
 		this.utilMax = utilMax;
-		this.timer = new Timer(time, millis);
+		this.timer = new Timer(time);
 	}
 
 	public void setLogEnabled(boolean b) {
@@ -236,14 +236,9 @@ public class IterativeDeepeningAlphaBetaSearch<STATE, ACTION, PLAYER> implements
 		private long duration;
 		private long startTime;
 
-		Timer(int maxTime, boolean millis) {
-			if (millis) {
-				this.duration = maxTime;
-			} else {
-				this.duration = 1000l * maxTime;
-			}
+		Timer(int maxSeconds) {
+			this.duration = 1000l * maxSeconds;
 		}
-        
 
 		void start() {
 			startTime = System.currentTimeMillis();

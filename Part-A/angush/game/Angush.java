@@ -28,7 +28,7 @@ public class Angush implements aiproj.slider.SliderPlayer {
     @Override
     public void init(int dimension, String board, char player) {
         this.game = new SliderGame(dimension, board, player);
-        this.strategy = new SliderAIPlayer(game, -SliderGame.INFINITY, SliderGame.INFINITY, 250, true);
+        this.strategy = new SliderAIPlayer(game, -SliderGame.INFINITY, SliderGame.INFINITY, 250);
         this.firstMove = true;
     }
 
