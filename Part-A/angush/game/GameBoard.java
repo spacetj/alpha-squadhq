@@ -358,7 +358,7 @@ public class GameBoard implements Cloneable {
     public double calculateHeuristics(Move move, Endgame player) {
         GameBoard newBoard = clone();
         newBoard.makeMove(move, player);
-        return calculateHeuristics(player);
+        return newBoard.calculateHeuristics(player);
     }
 
     /**
@@ -373,12 +373,12 @@ public class GameBoard implements Cloneable {
         if (player == Endgame.HORIZONTAL) {
             result += determineWinDistance(Endgame.VERTICAL);
             result -= determineWinDistance(Endgame.HORIZONTAL);
-            result += Math.random() * 0.5;
+            result += Math.random() * 0.05;
             return result;
         } else {
             result += determineWinDistance(Endgame.HORIZONTAL);
             result -= determineWinDistance(Endgame.VERTICAL);
-            result += Math.random() * 0.5;
+            result += Math.random() * 0.05;
             return result;
         }
     }
