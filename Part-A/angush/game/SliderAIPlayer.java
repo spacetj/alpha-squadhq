@@ -1,7 +1,3 @@
-/**
- * TODO: Commented out because we dont have an evluation function.
- */
-
 package angush.game;
 
 import aima.core.agent.Action;
@@ -16,7 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by TJ on 30/4/17.
+ * A player for Slider using iterative deepening alpha beta search.
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
 public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard, Move, Endgame> {
 
@@ -48,6 +45,9 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
         else return actions;
     }
 
+    /**
+     * Calculates the utility value for a board state
+     */
     @Override
     protected double eval(GameBoard state, Endgame player) {
         super.eval(state, player);

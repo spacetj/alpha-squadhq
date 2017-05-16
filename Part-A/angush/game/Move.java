@@ -81,6 +81,40 @@ public class Move implements Cloneable
         return direction;
     }
 
+    /**
+     * Convert from aiproj.slider.Move to this move representation.
+     *
+     * @param from The move to convert.
+     * @return The converted move.
+     */
+    public static Move fromAiProjMove(aiproj.slider.Move from) {
+        Move to;
+        Direction convertedDirection;
+        if (from.d == aiproj.slider.Move.Direction.DOWN) convertedDirection = Direction.DOWN;
+        else if (from.d == aiproj.slider.Move.Direction.LEFT) convertedDirection = Direction.LEFT;
+        else if (from.d == aiproj.slider.Move.Direction.RIGHT) convertedDirection = Direction.RIGHT;
+        else convertedDirection = Direction.UP;
+        to = new Move(from.j, from.i, convertedDirection);
+        return to;
+    }
+
+    /**
+     * Convert from this move representation to aiproj.slider.Move
+     *
+     * @param from The move to convert.
+     * @return The converted move.
+     */
+    public static aiproj.slider.Move toAiProjMove(Move from) {
+        aiproj.slider.Move to;
+        aiproj.slider.Move.Direction convertedDirection;
+        if (from.getDirection() == Direction.DOWN) convertedDirection = aiproj.slider.Move.Direction.DOWN;
+        else if (from.getDirection() == Direction.LEFT) convertedDirection = aiproj.slider.Move.Direction.LEFT;
+        else if (from.getDirection() == Direction.RIGHT) convertedDirection = aiproj.slider.Move.Direction.RIGHT;
+        else convertedDirection = aiproj.slider.Move.Direction.UP;
+        to = new aiproj.slider.Move(from.getSourceCol(), from.getSourceRow(), convertedDirection);
+        return to;
+    }
+
 
     @Override
     public String toString() {
@@ -94,9 +128,9 @@ public class Move implements Cloneable
     }
 
     @Override
-    public Move clone(){
+    public Move clone() {
         Move result = null;
-        try{
+        try {
             result = (Move) super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();

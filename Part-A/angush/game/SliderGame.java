@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by TJ on 3/5/17.
+ * Representation of Slider required by AIMA
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
 public class SliderGame implements Game<GameBoard, Move, Endgame> {
     protected GameBoard gameBoard;

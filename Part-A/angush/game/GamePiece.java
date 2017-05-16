@@ -6,13 +6,14 @@ import java.util.ArrayList;
  * A representation of a piece in a game of Slider
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
-public class GamePiece implements Cloneable{
+public class GamePiece implements Cloneable {
     private int row;
     private int col;
     private CellState type;
     private boolean crossedFinishLine = false;
     private ArrayList<Move> moves;
     private int dimension;
+
     /**
      * @param row The row position.
      * @param col The column position.
@@ -108,17 +109,17 @@ public class GamePiece implements Cloneable{
     }
 
     @Override
-    public GamePiece clone(){
+    public GamePiece clone() {
         GamePiece result = null;
         try {
             result = (GamePiece) super.clone();
             ArrayList<Move> cloningMoves = new ArrayList<>();
-            for(int i=0;i<getMoves().size();i++){
+            for (int i=0; i<getMoves().size(); i++) {
                 cloningMoves.add(result.getMoves().get(i).clone());
             }
             result.setMoves(cloningMoves);
             return result;
-        } catch (CloneNotSupportedException e){
+        } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
         return result;

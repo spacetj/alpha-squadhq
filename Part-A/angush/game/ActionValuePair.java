@@ -1,6 +1,9 @@
 package angush.game;
 
-
+/**
+ * Pair of Actions and their utility value
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
+ */
 public class ActionValuePair<ACTION> implements Comparable<ActionValuePair<ACTION>> {
     private ACTION action;
     private double value;
@@ -24,11 +27,12 @@ public class ActionValuePair<ACTION> implements Comparable<ActionValuePair<ACTIO
 
     @Override
     public int compareTo(ActionValuePair<ACTION> pair) {
-        if (value < pair.value)
+        if (value < pair.value) {
             return 1;
-        else if (value > pair.value)
+        } else if (value > pair.value) {
             return -1;
-        else
+        } else {
             return 0;
+        }
     }
 }

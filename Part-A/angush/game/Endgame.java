@@ -1,5 +1,9 @@
 package angush.game;
 
+/**
+ * The possible states of turns.
+ * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
+ */
 public enum Endgame
 {
     HORIZONTAL,

@@ -20,25 +20,23 @@ public class GameBoard implements Cloneable {
     private Endgame player;
     private Endgame opponent;
     private int dimension;
+    private Endgame turn;
+    private double utility;
     private ArrayList<GamePiece> hPieces = new ArrayList<GamePiece>();
     private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();
-    private static int NUM_PIECES = 0;
+    private int numPieces = 0;
     private static final int BLOCK_WEIGHT = 10;
 
-
-    private Endgame turn;
-    private double utility; // 0 is for horizontal, 1 is for vertical, 0.5 is for draw.
-
     /**
-     * Creates a angush.game.GameBoard from a scanner.
+     * Creates a GameBoard from a scanner.
      *
-     * @return The angush.game.GameBoard representation of the input.
+     * @return The GameBoard representation of the input.
      */
     public GameBoard(int dimension, String board, char player) {
         // Get the dimension and hence the board size
         this.dimension = dimension;
         this.utility = -1;
-        NUM_PIECES = dimension - 1;
+        numPieces = dimension - 1;
         String[] stringBoard = board.split("\\n");
         if (player == 'H') {
             this.player = Endgame.HORIZONTAL;
@@ -50,6 +48,7 @@ public class GameBoard implements Cloneable {
             this.turn = this.opponent;
         }
 
+        // Convert the string representation of the board
         this.board = new CellState[dimension][dimension];
         for (int i = dimension - 1, k = 0; i >= 0 && k < this.dimension; i--, k++) {
             String[] pieces = stringBoard[k].split("\\s+");
@@ -85,7 +84,6 @@ public class GameBoard implements Cloneable {
         updateMoves();
     }
 
-
     /**
      * Determines whether a move is valid based on the board.
      *
@@ -93,16 +91,16 @@ public class GameBoard implements Cloneable {
      * @return Whether the move is valid.
      */
     public boolean isValidMove(Move m) {
+        // Assume the source is valid
         CellState source = board[m.getSourceRow()][m.getSourceCol()];
 
+        // Pieces can move off the board into their respective goal
         if ((source == CellState.HORIZONTAL && m.getDestCol() == dimension) ||
                 (source == CellState.VERTICAL && m.getDestRow() == dimension)) {
             return true;
         }
-        // Positions must be within the board
-        else if (m.getSourceRow() < 0 || m.getSourceRow() >= dimension ||
-                m.getSourceCol() < 0 || m.getSourceCol() >= dimension ||
-                m.getDestRow() < 0 || m.getDestRow() >= dimension ||
+        // Destination must be within the board
+        else if (m.getDestRow() < 0 || m.getDestRow() >= dimension ||
                 m.getDestCol() < 0 || m.getDestCol() >= dimension ||
                 // Source must be a piece
                 source == CellState.FREE || source == CellState.BLOCKED ||
@@ -118,9 +116,9 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * Prints the number of legal moves for the horizontal player.
+     * @return The number of legal moves for the horizontal player.
      */
-    public int printNumLegalHMoves() {
+    public int numLegalHMoves() {
         int count = 0;
 
         if (hPieces.size() > 0) {
@@ -132,9 +130,9 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * Prints the number of legal moves for the vertical player.
+     * @return The number of legal moves for the vertical player.
      */
-    public int printNumLegalVMoves() {
+    public int numLegalVMoves() {
         int count = 0;
 
         if (vPieces.size() > 0) {
@@ -200,13 +198,11 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * Checks to see if the move is valid and the game is not over.
-     * Updated the local board, and then updates the arraylist of gamepieces.
-     * Then it switches the turn to opponents or game over.
+     * Update the board with a move.
      *
-     * @param move
-     * @param player
-     * @return
+     * @param move The move to make.
+     * @param player The player making the move.
+     * @return Whether the update succeeded.
      */
     public boolean makeMove(Move move, Endgame player) {
 
@@ -227,11 +223,8 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * Checks to see if the game is over by looking at the turn variable.
-     *
-     * @return
+     * @return Whether the game is over.
      */
-
     public boolean isGameOver() {
         if (turn == Endgame.HORIZONTAL_WIN || turn == Endgame.VERTICAL_WIN || turn == Endgame.TIE) {
             return true;
@@ -240,15 +233,13 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * When making a move, after the board is updated, this function is called to update
-     * the list of gamepieces.
+     * Update the pieces with a move.
      *
-     * @param move
-     * @param gamePieces
-     * @return
+     * @param move The move made.
+     * @param gamePieces The pieces to update.
+     * @return Whether the update succeeded.
      */
-
-    public boolean updatePiecesList(Move move, ArrayList<GamePiece> gamePieces) {
+    private boolean updatePiecesList(Move move, ArrayList<GamePiece> gamePieces) {
         if (move == null) {
             updateMoves();
             return true;
@@ -266,47 +257,52 @@ public class GameBoard implements Cloneable {
     }
 
     /**
-     * Determine the turn / winning / losing state of the game by checking various things.
+     * Determine the turn state of the board.
      *
-     * @return
+     * @return The turn state of the board.
      */
-
     public Endgame determineTurn() {
-
-        // Iterate through the horizontal pieces and check if all pieces are over the finish line
-        for (int piece = 0; piece < dimension - 1; piece++) {
-            if (!hPieces.get(piece).isCrossedFinishLine()) break;
-            // Check if final iteration
-            if (piece == dimension - 2) {
-                if (player == Endgame.HORIZONTAL) {
-                    utility = SliderGame.INFINITY;
-                } else {
-                    utility = -SliderGame.INFINITY;
-                }
-                return Endgame.HORIZONTAL_WIN;
+        // Check if horizontal has won
+        boolean hWin = true;
+        for (GamePiece p : hPieces) {
+            if (!p.isCrossedFinishLine()) {
+                hWin = false;
+                break;
             }
         }
-
-        // Iterate through the vertical pieces and check if all pieces are over the finish line
-        for (int piece = 0; piece < dimension - 1; piece++) {
-            if (!vPieces.get(piece).isCrossedFinishLine()) break;
-            // Check if final iteration
-            if (piece == dimension - 2) {
-                if (player == Endgame.VERTICAL) {
-                    utility = SliderGame.INFINITY;
-                } else {
-                    utility = -SliderGame.INFINITY;
-                }
-                return Endgame.VERTICAL_WIN;
+        if (hWin) {
+            if (player == Endgame.HORIZONTAL) {
+                utility = SliderGame.INFINITY;
+            } else {
+                utility = -SliderGame.INFINITY;
             }
+            return Endgame.HORIZONTAL_WIN;
         }
 
-        // Iterate through both pieces, even if 1 piece has a valid move left, break, else tie.
-        if (printNumLegalHMoves() == 0 && printNumLegalVMoves() == 0) {
+        // Check if vertical has won
+        boolean vWin = true;
+        for (GamePiece p : vPieces) {
+            if (!p.isCrossedFinishLine()) {
+                vWin = false;
+                break;
+            }
+        }
+        if (vWin) {
+            if (player == Endgame.VERTICAL) {
+                utility = SliderGame.INFINITY;
+            } else {
+                utility = -SliderGame.INFINITY;
+            }
+            return Endgame.VERTICAL_WIN;
+        }
+
+        // Check for a tie
+        if (numLegalHMoves() == 0 && numLegalVMoves() == 0) {
             utility = 0;
             return Endgame.TIE;
         }
 
+        // Game hasn't ended
         utility = -1;
         return (this.turn == player) ? opponent : player;
     }
@@ -333,7 +329,7 @@ public class GameBoard implements Cloneable {
     /**
      * Prints out the board config.
      *
-     * @return
+     * @return The board config.
      */
     @Override
     public String toString() {
@@ -348,68 +344,43 @@ public class GameBoard implements Cloneable {
         return printBoard;
     }
 
-    /**
-     * Returns the utility which is set in determineTurn() function.
-     *
-     * @return
-     */
-
     public double getUtility() {
         return utility;
     }
 
     /**
-     * TODO: This function is not used. But we can implement it once we have a proper evaluation function
+     * Calculate the heuristic for this board with some move applied.
      *
-     * @param move
-     * @param player
-     * @return
+     * @param move The move to apply to the board.
+     * @param player The player to calculate the heuristic for.
+     * @return The heuristic value for this board.
      */
     public double calculateHeuristics(Move move, Endgame player) {
         GameBoard newBoard = clone();
         newBoard.makeMove(move, player);
-        double result = 0;
-
-        if (player == Endgame.HORIZONTAL) {
-            result += newBoard.determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
-            result -= newBoard.determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
-            result += Math.random() * 0.5;
-            return result;
-        } else {
-            result += newBoard.determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
-            result -= newBoard.determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
-            result += Math.random() * 0.5;
-            return result;
-        }
+        return calculateHeuristics(player);
     }
 
+    /**
+     * Calculate the heuristic for this board.
+     * 
+     * @param player The player to calculate the heuristic for.
+     * @return The heuristic value for this board.
+     */
     public double calculateHeuristics(Endgame player) {
         double result = 0;
 
         if (player == Endgame.HORIZONTAL) {
-            result += determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
-            result -= determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
+            result += determineWinDistance(Endgame.VERTICAL);
+            result -= determineWinDistance(Endgame.HORIZONTAL);
             result += Math.random() * 0.5;
             return result;
         } else {
-            result += determineWinDistance(Endgame.HORIZONTAL, BLOCK_WEIGHT);
-            result -= determineWinDistance(Endgame.VERTICAL, BLOCK_WEIGHT);
+            result += determineWinDistance(Endgame.HORIZONTAL);
+            result -= determineWinDistance(Endgame.VERTICAL);
             result += Math.random() * 0.5;
             return result;
         }
-    }
-
-    /**
-     * TODO: Not used, but can be helpful for our evaluation function.
-     *
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @return
-     */
-    public int manhattanDistace(int x0, int y0, int x1, int y1) {
-        return Math.abs(x1 - x0) + Math.abs(y1 - y0);
     }
 
     /**
@@ -427,9 +398,9 @@ public class GameBoard implements Cloneable {
                 cloningBoardState[i] = Arrays.copyOf(board[i], board[i].length);
             }
             boardClone.board = cloningBoardState;
-            ArrayList<GamePiece> cloninghPieces = new ArrayList<>(NUM_PIECES);
-            ArrayList<GamePiece> cloningvPieces = new ArrayList<>(NUM_PIECES);
-            for (int i = 0; i < NUM_PIECES; i++) {
+            ArrayList<GamePiece> cloninghPieces = new ArrayList<>(numPieces);
+            ArrayList<GamePiece> cloningvPieces = new ArrayList<>(numPieces);
+            for (int i = 0; i < numPieces; i++) {
                 cloninghPieces.add(new GamePiece(hPieces.get(i)));
                 cloningvPieces.add(new GamePiece(vPieces.get(i)));
             }
@@ -451,7 +422,7 @@ public class GameBoard implements Cloneable {
                     if (!(board[i][j] == anotherState.board[i][j])) return false;
                 }
             }
-            for (int i = 0; i < NUM_PIECES; i++) {
+            for (int i = 0; i < numPieces; i++) {
                 if (hPieces.get(i) != anotherState.hPieces.get(i)) return false;
                 if (vPieces.get(i) != anotherState.vPieces.get(i)) return false;
             }
@@ -465,7 +436,6 @@ public class GameBoard implements Cloneable {
         // Need to ensure equal objects have equivalent hashcodes (Issue 77).
         return toString().hashCode();
     }
-
 
     public ArrayList<Move> getMoves(Endgame player) {
         return getMoves(getMyPieces(turn));
@@ -495,15 +465,14 @@ public class GameBoard implements Cloneable {
      * Calculates the minimum distance to victory for a side
      *
      * @param side     The side to use
-     * @param infinity The number used for infinity
      */
-    public int determineWinDistance(Endgame side, int infinity) {
+    public int determineWinDistance(Endgame side) {
         LinkedList<Pair<Integer, Integer>> queue = new LinkedList<Pair<Integer, Integer>>();
         int[][] dists = new int[dimension][dimension];
 
-        // Initialise to infinity
+        // Initialise to BLOCK_WEIGHT
         for (int i = 0; i < dimension; i++) {
-            Arrays.fill(dists[i], infinity);
+            Arrays.fill(dists[i], BLOCK_WEIGHT);
         }
 
         // Initialise the edge
@@ -513,7 +482,7 @@ public class GameBoard implements Cloneable {
                     queue.addLast(new Pair<Integer, Integer>(i, dimension - 1));
                     if (board[i][dimension - 1] == CellState.BLOCKED ||
                             board[i][dimension - 1] == CellState.VERTICAL) {
-                        dists[i][dimension - 1] = infinity;
+                        dists[i][dimension - 1] = BLOCK_WEIGHT;
                     } else {
                         dists[i][dimension - 1] = 1;
                     }
@@ -522,7 +491,7 @@ public class GameBoard implements Cloneable {
                     queue.addLast(new Pair<Integer, Integer>(dimension - 1, i));
                     if (board[dimension - 1][i] == CellState.BLOCKED ||
                             board[dimension - 1][i] == CellState.HORIZONTAL) {
-                        dists[dimension - 1][i] = infinity;
+                        dists[dimension - 1][i] = BLOCK_WEIGHT;
                     } else {
                         dists[dimension - 1][i] = 1;
                     }
@@ -534,7 +503,7 @@ public class GameBoard implements Cloneable {
         while (!queue.isEmpty()) {
             Pair<Integer, Integer> pos = queue.remove();
             CellState testPos;
-            if (dists[pos.getKey()][pos.getValue()] == infinity) {
+            if (dists[pos.getKey()][pos.getValue()] == BLOCK_WEIGHT) {
                 continue;
             }
             switch (side) {
@@ -543,7 +512,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getKey() != dimension - 1) {
                         testPos = board[pos.getKey() + 1][pos.getValue()];
                         if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
-                                dists[pos.getKey() + 1][pos.getValue()] == infinity) {
+                                dists[pos.getKey() + 1][pos.getValue()] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey() + 1, pos.getValue()));
                             dists[pos.getKey() + 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -552,7 +521,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getKey() != 0) {
                         testPos = board[pos.getKey() - 1][pos.getValue()];
                         if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
-                                dists[pos.getKey() - 1][pos.getValue()] == infinity) {
+                                dists[pos.getKey() - 1][pos.getValue()] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
                             dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -561,7 +530,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getValue() != 0) {
                         testPos = board[pos.getKey()][pos.getValue() - 1];
                         if ((testPos == CellState.FREE || testPos == CellState.HORIZONTAL) &&
-                                dists[pos.getKey()][pos.getValue() - 1] == infinity) {
+                                dists[pos.getKey()][pos.getValue() - 1] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
                             dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -572,7 +541,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getKey() != 0) {
                         testPos = board[pos.getKey() - 1][pos.getValue()];
                         if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
-                                dists[pos.getKey() - 1][pos.getValue()] == infinity) {
+                                dists[pos.getKey() - 1][pos.getValue()] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey() - 1, pos.getValue()));
                             dists[pos.getKey() - 1][pos.getValue()] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -581,7 +550,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getValue() != 0) {
                         testPos = board[pos.getKey()][pos.getValue() - 1];
                         if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
-                                dists[pos.getKey()][pos.getValue() - 1] == infinity) {
+                                dists[pos.getKey()][pos.getValue() - 1] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() - 1));
                             dists[pos.getKey()][pos.getValue() - 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -590,7 +559,7 @@ public class GameBoard implements Cloneable {
                     if (pos.getValue() != dimension - 1) {
                         testPos = board[pos.getKey()][pos.getValue() + 1];
                         if ((testPos == CellState.FREE || testPos == CellState.VERTICAL) &&
-                                dists[pos.getKey()][pos.getValue() + 1] == infinity) {
+                                dists[pos.getKey()][pos.getValue() + 1] == BLOCK_WEIGHT) {
                             queue.addLast(new Pair<Integer, Integer>(pos.getKey(), pos.getValue() + 1));
                             dists[pos.getKey()][pos.getValue() + 1] = dists[pos.getKey()][pos.getValue()] + 1;
                         }
@@ -613,77 +582,7 @@ public class GameBoard implements Cloneable {
             }
         }
 
-        return Integer.min(dist, infinity);
-    }
-
-    /**
-     * Calculates the average lateral position for a side and optionally normalises for number of game pieces
-     *
-     * @param side      The side to use
-     * @param normalise Whether the result is normalised
-     */
-    public double determineLateralPosition(Endgame side, boolean normalise) {
-        // Add up the positions for each piece
-        double pos = 0;
-        int numPieces = 0;
-        double mid = dimension / 2.0;
-        switch (side) {
-            case HORIZONTAL:
-                numPieces = hPieces.size();
-                for (GamePiece piece : hPieces) {
-                    if (!piece.isCrossedFinishLine()) {
-                        pos += Math.abs(mid - piece.getRow());
-                        numPieces++;
-                    }
-                }
-                break;
-            case VERTICAL:
-                numPieces = vPieces.size();
-                for (GamePiece piece : vPieces) {
-                    if (!piece.isCrossedFinishLine()) {
-                        pos += Math.abs(mid - piece.getCol());
-                        numPieces++;
-                    }
-                }
-        }
-
-        // Normalise for board size
-        pos /= dimension;
-
-        // Optionally normalise for number of pieces remaining
-        if (normalise) {
-            pos /= numPieces;
-        }
-
-        return pos;
-    }
-
-    /**
-     * TODO: Can get rid of the function.
-     * Prints out the gamePieces for debugging
-     *
-     * @param pieces
-     */
-
-    public void strOutArrayListGamePiece(ArrayList<GamePiece> pieces) {
-        for (int i = 0; i < NUM_PIECES; i++) {
-            System.out.println("Piece " + i + " " + pieces.get(i).getType() + " " +
-                    pieces.get(i).getRow() + " " + pieces.get(i).getCol());
-            strOutArraylistMoves(pieces.get(i).getMoves());
-        }
-    }
-
-    /**
-     * TODO: Can get rid of the function.
-     * Prints out the gamePIeces for debugging.
-     *
-     * @param moves
-     */
-
-    public void strOutArraylistMoves(ArrayList<Move> moves) {
-        for (Move move : moves) {
-            System.out.println(move.getSourceRow() + " " + move.getSourceCol() + " " + move.getDirection());
-        }
+        return dist;
     }
 
     public void setTurn(Endgame turn) {
