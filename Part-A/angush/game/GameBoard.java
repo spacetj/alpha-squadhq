@@ -17,10 +17,10 @@ import javafx.util.Pair;
  */
 public class GameBoard implements Cloneable {
     private CellState[][] board;
-    private Endgame player;
-    private Endgame opponent;
+    private TurnState player;
+    private TurnState opponent;
     private int dimension;
-    private Endgame turn;
+    private TurnState turn;
     private double utility;
     private ArrayList<GamePiece> hPieces = new ArrayList<GamePiece>();
     private ArrayList<GamePiece> vPieces = new ArrayList<GamePiece>();
@@ -39,12 +39,12 @@ public class GameBoard implements Cloneable {
         numPieces = dimension - 1;
         String[] stringBoard = board.split("\\n");
         if (player == 'H') {
-            this.player = Endgame.HORIZONTAL;
-            this.opponent = Endgame.VERTICAL;
+            this.player = TurnState.HORIZONTAL;
+            this.opponent = TurnState.VERTICAL;
             this.turn = this.player;
         } else {
-            this.player = Endgame.VERTICAL;
-            this.opponent = Endgame.HORIZONTAL;
+            this.player = TurnState.VERTICAL;
+            this.opponent = TurnState.HORIZONTAL;
             this.turn = this.opponent;
         }
 
@@ -204,7 +204,7 @@ public class GameBoard implements Cloneable {
      * @param player The player making the move.
      * @return Whether the update succeeded.
      */
-    public boolean makeMove(Move move, Endgame player) {
+    public boolean makeMove(Move move, TurnState player) {
 
         boolean result = false;
         if (move == null) {
@@ -226,7 +226,7 @@ public class GameBoard implements Cloneable {
      * @return Whether the game is over.
      */
     public boolean isGameOver() {
-        if (turn == Endgame.HORIZONTAL_WIN || turn == Endgame.VERTICAL_WIN || turn == Endgame.TIE) {
+        if (turn == TurnState.HORIZONTAL_WIN || turn == TurnState.VERTICAL_WIN || turn == TurnState.TIE) {
             return true;
         }
         return false;
@@ -261,7 +261,7 @@ public class GameBoard implements Cloneable {
      *
      * @return The turn state of the board.
      */
-    public Endgame determineTurn() {
+    public TurnState determineTurn() {
         // Check if horizontal has won
         boolean hWin = true;
         for (GamePiece p : hPieces) {
@@ -271,12 +271,12 @@ public class GameBoard implements Cloneable {
             }
         }
         if (hWin) {
-            if (player == Endgame.HORIZONTAL) {
+            if (player == TurnState.HORIZONTAL) {
                 utility = SliderGame.INFINITY;
             } else {
                 utility = -SliderGame.INFINITY;
             }
-            return Endgame.HORIZONTAL_WIN;
+            return TurnState.HORIZONTAL_WIN;
         }
 
         // Check if vertical has won
@@ -288,18 +288,18 @@ public class GameBoard implements Cloneable {
             }
         }
         if (vWin) {
-            if (player == Endgame.VERTICAL) {
+            if (player == TurnState.VERTICAL) {
                 utility = SliderGame.INFINITY;
             } else {
                 utility = -SliderGame.INFINITY;
             }
-            return Endgame.VERTICAL_WIN;
+            return TurnState.VERTICAL_WIN;
         }
 
         // Check for a tie
         if (numLegalHMoves() == 0 && numLegalVMoves() == 0) {
             utility = 0;
-            return Endgame.TIE;
+            return TurnState.TIE;
         }
 
         // Game hasn't ended
@@ -313,8 +313,8 @@ public class GameBoard implements Cloneable {
      * @param turn
      * @return
      */
-    public ArrayList<GamePiece> getMyPieces(Endgame turn) {
-        return (turn == Endgame.HORIZONTAL) ? hPieces : vPieces;
+    public ArrayList<GamePiece> getMyPieces(TurnState turn) {
+        return (turn == TurnState.HORIZONTAL) ? hPieces : vPieces;
     }
 
     /**
@@ -322,7 +322,7 @@ public class GameBoard implements Cloneable {
      *
      * @return
      */
-    public Endgame getTurn() {
+    public TurnState getTurn() {
         return turn;
     }
 
@@ -355,7 +355,7 @@ public class GameBoard implements Cloneable {
      * @param player The player to calculate the heuristic for.
      * @return The heuristic value for this board.
      */
-    public double calculateHeuristics(Move move, Endgame player) {
+    public double calculateHeuristics(Move move, TurnState player) {
         GameBoard newBoard = clone();
         newBoard.makeMove(move, player);
         return newBoard.calculateHeuristics(player);
@@ -367,17 +367,17 @@ public class GameBoard implements Cloneable {
      * @param player The player to calculate the heuristic for.
      * @return The heuristic value for this board.
      */
-    public double calculateHeuristics(Endgame player) {
+    public double calculateHeuristics(TurnState player) {
         double result = 0;
 
-        if (player == Endgame.HORIZONTAL) {
-            result += determineWinDistance(Endgame.VERTICAL);
-            result -= determineWinDistance(Endgame.HORIZONTAL);
+        if (player == TurnState.HORIZONTAL) {
+            result += determineWinDistance(TurnState.VERTICAL);
+            result -= determineWinDistance(TurnState.HORIZONTAL);
             result += Math.random() * 0.05;
             return result;
         } else {
-            result += determineWinDistance(Endgame.HORIZONTAL);
-            result -= determineWinDistance(Endgame.VERTICAL);
+            result += determineWinDistance(TurnState.HORIZONTAL);
+            result -= determineWinDistance(TurnState.VERTICAL);
             result += Math.random() * 0.05;
             return result;
         }
@@ -437,7 +437,7 @@ public class GameBoard implements Cloneable {
         return toString().hashCode();
     }
 
-    public ArrayList<Move> getMoves(Endgame player) {
+    public ArrayList<Move> getMoves(TurnState player) {
         return getMoves(getMyPieces(turn));
 
     }
@@ -453,11 +453,11 @@ public class GameBoard implements Cloneable {
         return moves;
     }
 
-    public Endgame getPlayer() {
+    public TurnState getPlayer() {
         return player;
     }
 
-    public Endgame getOpponent() {
+    public TurnState getOpponent() {
         return opponent;
     }
 
@@ -466,7 +466,7 @@ public class GameBoard implements Cloneable {
      *
      * @param side     The side to use
      */
-    public int determineWinDistance(Endgame side) {
+    public int determineWinDistance(TurnState side) {
         LinkedList<Pair<Integer, Integer>> queue = new LinkedList<Pair<Integer, Integer>>();
         int[][] dists = new int[dimension][dimension];
 
@@ -571,7 +571,7 @@ public class GameBoard implements Cloneable {
         // Add up the distances for each piece
         ArrayList<GamePiece> pieces;
         int dist = 0;
-        if (side == Endgame.HORIZONTAL) {
+        if (side == TurnState.HORIZONTAL) {
             pieces = hPieces;
         } else {
             pieces = vPieces;
@@ -585,7 +585,7 @@ public class GameBoard implements Cloneable {
         return dist;
     }
 
-    public void setTurn(Endgame turn) {
+    public void setTurn(TurnState turn) {
         this.turn = turn;
     }
 }

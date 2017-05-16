@@ -8,7 +8,7 @@ ActionValuePair: A pair consisting of moves and values, used by AIMA
 Angush: The player class which implements the interface needed by the referee
 CellState: Enumeration of possible cell states
 Direction: Enumeration of possible directions
-Endgame: Enumeration of turn states, also used for player and terminal states
+TurnState: Enumeration of turn states, also used for player and terminal states
 GameBoard: Representation of the board, along with board-specific functions like
     calculation of the heuristic
 GamePiece: Representation of a piece on the board, contains things like position and

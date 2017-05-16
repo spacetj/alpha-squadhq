@@ -9,7 +9,7 @@ import java.util.List;
  * Representation of Slider required by AIMA
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
-public class SliderGame implements Game<GameBoard, Move, Endgame> {
+public class SliderGame implements Game<GameBoard, Move, TurnState> {
     protected GameBoard gameBoard;
     public static final int INFINITY = 100;
 
@@ -24,12 +24,12 @@ public class SliderGame implements Game<GameBoard, Move, Endgame> {
     }
 
     @Override
-    public Endgame[] getPlayers() {
-        return new Endgame[]{gameBoard.getPlayer(), gameBoard.getOpponent()};
+    public TurnState[] getPlayers() {
+        return new TurnState[]{gameBoard.getPlayer(), gameBoard.getOpponent()};
     }
 
     @Override
-    public Endgame getPlayer(GameBoard gameBoard) {
+    public TurnState getPlayer(GameBoard gameBoard) {
         return gameBoard.getTurn();
     }
 
@@ -51,7 +51,7 @@ public class SliderGame implements Game<GameBoard, Move, Endgame> {
     }
 
     @Override
-    public double getUtility(GameBoard gameBoard, Endgame player) {
+    public double getUtility(GameBoard gameBoard, TurnState player) {
         return gameBoard.getUtility();
     }
 }

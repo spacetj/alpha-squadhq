@@ -4,7 +4,7 @@ import aima.core.agent.Action;
 import aima.core.agent.State;
 import aima.core.search.adversarial.Game;
 import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
-import angush.game.Endgame;
+import angush.game.TurnState;
 import angush.game.Move;
 
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.List;
  * A player for Slider using iterative deepening alpha beta search.
  * Written by Angus Huang 640386 (angush) and Tejas Cherukara 694985 (taniyan)
  */
-public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard, Move, Endgame> {
+public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard, Move, TurnState> {
 
-    public SliderAIPlayer(Game<GameBoard, Move, Endgame> game, double utilMin, double utilMax, int time,
+    public SliderAIPlayer(Game<GameBoard, Move, TurnState> game, double utilMin, double utilMax, int time,
                           boolean millis) {
         super(game, utilMin, utilMax, time, millis);
     }
@@ -27,7 +27,7 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
      * which profit from the action.
      */
     @Override
-    public List<Move> orderActions(GameBoard state, List<Move> actions, Endgame player, int depth) {
+    public List<Move> orderActions(GameBoard state, List<Move> actions, TurnState player, int depth) {
         List<Move> result = actions;
         if (depth == 0) {
             List<ActionValuePair<Move>> actionEstimates = new ArrayList<ActionValuePair<Move>>(
@@ -49,7 +49,7 @@ public class SliderAIPlayer extends IterativeDeepeningAlphaBetaSearch<GameBoard,
      * Calculates the utility value for a board state
      */
     @Override
-    protected double eval(GameBoard state, Endgame player) {
+    protected double eval(GameBoard state, TurnState player) {
         super.eval(state, player);
         if (game.isTerminal(state)) {
             return game.getUtility(state, player);
